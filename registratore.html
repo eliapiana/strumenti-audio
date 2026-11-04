@@ -2,29 +2,29 @@
 <html lang="it">
 <head>
 <meta charset="utf-8">
-<title>Registratore Audio</title>
+<title>Nastro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Registratore">
+<meta name="apple-mobile-web-app-title" content="Nastro">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#F5EEDB">
+<meta name="theme-color" content="#F3ECDA">
 <meta name="color-scheme" content="light">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* Layout: colonna unica da telefono, pannelli carta su fondo panna, strumenti in stile registratore a nastro. */
+/* Layout: colonna da telefono con due schermate (registra / riproduci). Fondo panna, inchiostro scuro, un solo accento arancio. */
 :root {
-  --panna: #F5EEDB;
-  --carta: #FBF7EA;
-  --inchiostro: #2B2721;
-  --tenue: #7A7160;
-  --linea: #D9CFB5;
-  --rec: #C23B2B;
+  --panna: #F3ECDA;
+  --carta: #FAF6E9;
+  --inchiostro: #262219;
+  --tenue: #7B7261;
+  --linea: #DAD0B6;
+  --rec: #EC4A1A;
   --ok: #5F7D4B;
   --ambra: #D69A2D;
-  --font-ui: "IBM Plex Sans Condensed", "Avenir Next Condensed", system-ui, sans-serif;
+  --font-ui: "Jost", "Futura", "Avenir Next", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
   color-scheme: light;
 }
@@ -36,37 +36,46 @@ body {
   line-height: 1.35;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   -webkit-text-size-adjust: 100%;
+  -webkit-user-select: none; user-select: none;
 }
-.app { max-width: 520px; margin: 0 auto; padding: 16px 16px 40px; display: flex; flex-direction: column; gap: 14px; }
+.app { max-width: 520px; margin: 0 auto; padding: 16px 16px 48px; display: flex; flex-direction: column; gap: 14px; }
 header.top { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-top: 4px; }
-h1 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
-h2 { margin: 0 0 10px; font-size: 13px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tenue); }
-.sub { margin: 2px 0 0; font-family: var(--font-mono); font-size: 12px; color: var(--tenue); }
-.pill { font-family: var(--font-mono); font-size: 12px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--linea); background: var(--carta); color: var(--tenue); white-space: nowrap; }
+h1 { margin: 0; font-size: 30px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
+h2 { margin: 0 0 10px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--tenue); }
+.sub { margin: 2px 0 0; font-family: var(--font-mono); font-size: 11px; color: var(--tenue); }
+.pill { font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--linea); background: var(--carta); color: var(--tenue); white-space: nowrap; }
 .pill[data-s="ready"] { color: var(--ok); border-color: var(--ok); }
 .pill[data-s="rec"] { color: #fff; background: var(--rec); border-color: var(--rec); animation: pulse 1.2s ease-in-out infinite; }
 .pill[data-s="busy"] { color: var(--ambra); border-color: var(--ambra); }
 @keyframes pulse { 50% { opacity: .65; } }
 @media (prefers-reduced-motion: reduce) { .pill[data-s="rec"] { animation: none; } }
 
+.tabs { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--inchiostro); border-radius: 12px; overflow: hidden; background: var(--carta); }
+.tabs button { min-height: 46px; border: 0; background: transparent; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; }
+.tabs button + button { border-left: 1.5px solid var(--inchiostro); }
+.tabs button[aria-pressed="true"] { background: var(--inchiostro); color: var(--panna); }
+
 .panel { background: var(--carta); border: 1px solid var(--linea); border-radius: 16px; padding: 14px; }
-.banner { display: flex; align-items: center; gap: 10px; background: #FFF3CF; border: 1px solid var(--ambra); border-radius: 12px; padding: 10px 12px; font-size: 15px; }
+.view { display: flex; flex-direction: column; gap: 14px; }
+.view[hidden] { display: none; }
+.banner { display: flex; align-items: center; gap: 10px; background: #FFF0C7; border: 1px solid var(--ambra); border-radius: 12px; padding: 10px 12px; font-size: 15px; }
 .banner[hidden] { display: none; }
 .banner span { flex: 1; }
 .banner .x { border: 0; background: none; font-size: 22px; line-height: 1; color: var(--tenue); padding: 4px 8px; }
 
 button, select, input { font: inherit; color: inherit; }
 button { cursor: pointer; }
-button:focus-visible, select:focus-visible, input:focus-visible, canvas:focus-visible { outline: 3px solid var(--ambra); outline-offset: 2px; }
+button:focus-visible, select:focus-visible, input:focus-visible, canvas:focus-visible, .knob:focus-visible, .platter:focus-visible { outline: 3px solid var(--ambra); outline-offset: 2px; }
 .btn { min-height: 46px; padding: 0 16px; border-radius: 12px; border: 1px solid var(--inchiostro); background: var(--inchiostro); color: var(--panna); font-weight: 500; }
 .btn.wide { width: 100%; }
 .btn.sm { min-height: 40px; padding: 0 12px; background: var(--carta); color: var(--inchiostro); border-color: var(--linea); }
+.btn.sm.on { background: var(--inchiostro); color: var(--panna); border-color: var(--inchiostro); }
 .btn:disabled { opacity: .4; cursor: default; }
 
 .field { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
 .field > span, .field > label { font-size: 14px; color: var(--tenue); }
 select { width: 100%; min-height: 44px; border-radius: 10px; border: 1px solid var(--linea); background: var(--panna); padding: 0 10px; font-size: 16px; }
-.info { margin: 8px 0 0; font-family: var(--font-mono); font-size: 12px; color: var(--tenue); min-height: 1em; }
+.info { margin: 8px 0 0; font-family: var(--font-mono); font-size: 11px; color: var(--tenue); min-height: 1em; }
 .seg { display: flex; border: 1px solid var(--linea); border-radius: 10px; overflow: hidden; background: var(--panna); }
 .seg button { flex: 1; min-height: 42px; border: 0; background: transparent; padding: 0 6px; font-size: 15px; }
 .seg button + button { border-left: 1px solid var(--linea); }
@@ -74,36 +83,62 @@ select { width: 100%; min-height: 44px; border-radius: 10px; border: 1px solid v
 .seg button:disabled { opacity: .45; }
 .gainrow { display: flex; align-items: center; gap: 12px; }
 .gainrow input[type=range] { flex: 1; accent-color: var(--inchiostro); height: 32px; }
-.gainrow output { font-family: var(--font-mono); font-size: 14px; min-width: 64px; text-align: right; }
+.gainrow output { font-family: var(--font-mono); font-size: 13px; min-width: 64px; text-align: right; }
 .toggle { display: flex; align-items: center; gap: 10px; min-height: 36px; color: var(--inchiostro) !important; font-size: 16px !important; }
 .toggle input { width: 22px; height: 22px; accent-color: var(--inchiostro); }
 
 .deck { padding-top: 10px; }
 .timer { font-family: var(--font-mono); font-weight: 500; font-size: 54px; line-height: 1.1; text-align: center; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .timer small { font-size: 26px; color: var(--tenue); }
-canvas#meter { width: 100%; height: 84px; display: block; margin-top: 4px; touch-action: manipulation; }
-.transport { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 10px; }
-.transport .side { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 12px; color: var(--tenue); text-align: center; }
-.mk { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--inchiostro); background: var(--carta); font-weight: 600; font-size: 13px; letter-spacing: .04em; }
+canvas#tape { width: 100%; height: 64px; display: block; margin-top: 2px; }
+canvas#meter { width: 100%; height: 108px; display: block; margin-top: 6px; touch-action: manipulation; }
+.transport { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px; margin-top: 12px; }
+.transport .side { display: flex; flex-direction: column; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 11px; color: var(--tenue); text-align: center; }
+.mk { width: 64px; height: 64px; border-radius: 50%; border: 2px solid var(--inchiostro); background: var(--carta); font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .08em; }
 .mk:disabled { opacity: .35; }
 .mk:active:not(:disabled) { background: var(--ambra); }
 .rec { width: 92px; height: 92px; border-radius: 50%; border: 3px solid var(--inchiostro); background: var(--carta); display: grid; place-items: center; padding: 0; }
 .rec i { display: block; width: 50px; height: 50px; border-radius: 50%; background: var(--rec); transition: width .15s, height .15s, border-radius .15s; }
 .rec[data-on="true"] i { width: 34px; height: 34px; border-radius: 8px; }
 .rec:disabled { opacity: .4; cursor: default; }
-.reclabel { text-align: center; font-family: var(--font-mono); font-size: 12px; margin-top: 6px; color: var(--tenue); letter-spacing: .08em; }
-.markers { min-height: 1.2em; margin: 8px 0 0; text-align: center; font-family: var(--font-mono); font-size: 12px; color: var(--tenue); }
+.reclabel { text-align: center; font-family: var(--font-mono); font-size: 11px; margin-top: 6px; color: var(--tenue); letter-spacing: .14em; }
+.markers { min-height: 1.2em; margin: 8px 0 0; text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--tenue); }
 
-.listhead { display: flex; justify-content: space-between; align-items: baseline; }
-.listhead .meta { font-family: var(--font-mono); font-size: 12px; color: var(--tenue); }
-.empty { color: var(--tenue); margin: 4px 0 0; }
-.take { background: var(--carta); border: 1px solid var(--linea); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
-.tname { width: 100%; border: 0; border-bottom: 1px dashed var(--linea); background: transparent; font-size: 17px; font-weight: 500; padding: 4px 0; border-radius: 0; }
-.take-meta { margin: 6px 0 8px; font-family: var(--font-mono); font-size: 12px; color: var(--tenue); }
-canvas.wave { width: 100%; height: 56px; display: block; background: var(--panna); border-radius: 8px; touch-action: manipulation; }
+/* Player */
+.pl-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.pl-name { font-weight: 500; font-size: 17px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl-time { font-family: var(--font-mono); font-size: 12px; color: var(--tenue); white-space: nowrap; font-variant-numeric: tabular-nums; }
+canvas#plWave { width: 100%; height: 64px; display: block; margin-top: 8px; background: var(--panna); border-radius: 10px; touch-action: none; }
 .marks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .marks:empty { display: none; }
-.chip { min-height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--ambra); background: #FFF3CF; font-family: var(--font-mono); font-size: 12px; }
+.chip { min-height: 32px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--ambra); background: #FFF0C7; font-family: var(--font-mono); font-size: 12px; }
+.platter { position: relative; width: min(80vw, 330px); aspect-ratio: 1; margin: 16px auto 6px; border-radius: 50%; touch-action: none; }
+.platter canvas { width: 100%; height: 100%; display: block; }
+.platter[aria-disabled="true"] { opacity: .5; }
+.hint { text-align: center; font-family: var(--font-mono); font-size: 11px; color: var(--tenue); margin: 0 0 6px; }
+.ptransport { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; }
+.tbtn { flex: none; min-width: 44px; min-height: 46px; padding: 0 6px; border-radius: 12px; border: 1px solid var(--linea); background: var(--carta); font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .06em; display: grid; place-items: center; }
+.tbtn[aria-pressed="true"] { background: var(--inchiostro); color: var(--panna); border-color: var(--inchiostro); }
+.tbtn:disabled { opacity: .4; }
+.tbtn svg { width: 18px; height: 18px; fill: currentColor; }
+.pplay { flex: none; width: 72px; height: 72px; border-radius: 50%; border: 3px solid var(--inchiostro); background: var(--carta); display: grid; place-items: center; padding: 0; }
+.pplay svg { width: 30px; height: 30px; fill: var(--rec); }
+.pplay:disabled { opacity: .4; }
+.knobs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 8px; margin-top: 18px; }
+.knob { display: flex; flex-direction: column; align-items: center; gap: 2px; touch-action: none; border-radius: 10px; }
+.knob svg { width: 58px; height: 58px; }
+.knob .kl { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; color: var(--tenue); }
+.knob .kv { font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
+.knobs[data-off="true"] { opacity: .45; pointer-events: none; }
+
+.listhead { display: flex; justify-content: space-between; align-items: baseline; }
+.listhead .meta { font-family: var(--font-mono); font-size: 11px; color: var(--tenue); }
+.empty { color: var(--tenue); margin: 4px 0 0; }
+.take { background: var(--carta); border: 1px solid var(--linea); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
+.take[data-loaded="true"] { border-color: var(--rec); box-shadow: 0 0 0 1px var(--rec); }
+.tname { width: 100%; border: 0; border-bottom: 1px dashed var(--linea); background: transparent; font-size: 17px; font-weight: 500; padding: 4px 0; border-radius: 0; -webkit-user-select: text; user-select: text; }
+.take-meta { margin: 6px 0 8px; font-family: var(--font-mono); font-size: 11px; color: var(--tenue); }
+canvas.wave { width: 100%; height: 48px; display: block; background: var(--panna); border-radius: 8px; }
 .take-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .take-actions .btn { flex: 1; min-width: 0; }
 .take-actions .del[data-armed="true"] { background: var(--rec); color: #fff; border-color: var(--rec); }
@@ -114,11 +149,16 @@ canvas.wave { width: 100%; height: 56px; display: block; background: var(--panna
 <main class="app">
   <header class="top">
     <div>
-      <h1>Registratore</h1>
+      <h1>Nastro</h1>
       <p class="sub" id="specs">WAV · microfono o interfaccia</p>
     </div>
     <div class="pill" id="pill" data-s="off">Ingresso spento</div>
   </header>
+
+  <div class="tabs" id="tabs" role="group" aria-label="Schermata">
+    <button type="button" data-v="rec" aria-pressed="true">Registra</button>
+    <button type="button" data-v="play" aria-pressed="false">Riproduci</button>
+  </div>
 
   <div class="banner" id="banner" role="status" hidden>
     <span id="bannerText"></span>
@@ -126,77 +166,116 @@ canvas.wave { width: 100%; height: 56px; display: block; background: var(--panna
     <button class="x" id="bannerX" aria-label="Chiudi avviso">×</button>
   </div>
 
-  <section class="panel" aria-label="Ingresso audio">
-    <h2>Ingresso</h2>
-    <button class="btn wide" id="btnInput">Attiva ingresso audio</button>
-    <div id="inputControls" hidden>
-      <div class="field">
-        <label for="selDevice">Sorgente</label>
-        <select id="selDevice"></select>
+  <!-- ================= REGISTRA ================= -->
+  <div class="view" id="viewRec">
+    <section class="panel" aria-label="Ingresso audio">
+      <h2>Ingresso</h2>
+      <button class="btn wide" id="btnInput">Attiva ingresso audio</button>
+      <div id="inputControls" hidden>
+        <div class="field">
+          <label for="selDevice">Sorgente</label>
+          <select id="selDevice"></select>
+        </div>
+        <p class="info" id="inInfo"></p>
+        <div class="field">
+          <span id="lblMode">Canali registrati</span>
+          <div class="seg" id="segMode" role="group" aria-labelledby="lblMode">
+            <button type="button" data-v="stereo">Stereo</button>
+            <button type="button" data-v="l">Canale 1</button>
+            <button type="button" data-v="r">Canale 2</button>
+            <button type="button" data-v="mix">Mono mix</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="gain">Guadagno</label>
+          <div class="gainrow">
+            <input type="range" id="gain" min="-12" max="24" step="0.5" value="0">
+            <output id="gainOut" for="gain">0 dB</output>
+          </div>
+        </div>
+        <div class="field">
+          <span id="lblFx">Colore (si imprime nella registrazione)</span>
+          <div class="seg" id="segFx" role="group" aria-labelledby="lblFx">
+            <button type="button" data-fx="comp" aria-pressed="false">Compressore</button>
+            <button type="button" data-fx="tape" aria-pressed="false">Saturazione nastro</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="toggle"><input type="checkbox" id="chkMon"> Monitor in cuffia</label>
+        </div>
       </div>
-      <p class="info" id="inInfo"></p>
-      <div class="field">
-        <span id="lblMode">Canali registrati</span>
-        <div class="seg" id="segMode" role="group" aria-labelledby="lblMode">
-          <button type="button" data-v="stereo">Stereo</button>
-          <button type="button" data-v="l">Canale 1</button>
-          <button type="button" data-v="r">Canale 2</button>
-          <button type="button" data-v="mix">Mono mix</button>
+    </section>
+
+    <section class="panel deck" aria-label="Registrazione">
+      <div class="timer" id="timer">00:00<small>.0</small></div>
+      <canvas id="tape" aria-hidden="true"></canvas>
+      <canvas id="meter" tabindex="0" aria-label="Livelli di ingresso. Tocca per azzerare gli indicatori di clip."></canvas>
+      <div class="transport">
+        <div class="side">
+          <button class="mk" id="btnMark" disabled aria-label="Aggiungi marker">MARK</button>
+        </div>
+        <div>
+          <button class="rec" id="btnRec" data-on="false" disabled aria-label="Registra"><i></i></button>
+          <div class="reclabel" id="recLabel">REC</div>
+        </div>
+        <div class="side" id="bufInfo">pre-roll<br>—</div>
+      </div>
+      <p class="markers" id="markersLine"></p>
+    </section>
+
+    <section class="panel" aria-label="Impostazioni">
+      <h2>Impostazioni</h2>
+      <div class="field" style="margin-top:0">
+        <span id="lblBits">Profondità</span>
+        <div class="seg" id="segBits" role="group" aria-labelledby="lblBits">
+          <button type="button" data-v="16">16 bit</button>
+          <button type="button" data-v="24">24 bit</button>
         </div>
       </div>
       <div class="field">
-        <label for="gain">Guadagno</label>
-        <div class="gainrow">
-          <input type="range" id="gain" min="-12" max="24" step="0.5" value="0">
-          <output id="gainOut" for="gain">0 dB</output>
+        <span id="lblPre">Pre-roll (registra anche i secondi prima del tocco)</span>
+        <div class="seg" id="segPre" role="group" aria-labelledby="lblPre">
+          <button type="button" data-v="0">No</button>
+          <button type="button" data-v="10">10 s</button>
+          <button type="button" data-v="20">20 s</button>
         </div>
       </div>
-      <div class="field">
-        <label class="toggle"><input type="checkbox" id="chkMon"> Monitor in cuffia</label>
-      </div>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <section class="panel deck" aria-label="Registrazione">
-    <div class="timer" id="timer">00:00<small>.0</small></div>
-    <canvas id="meter" tabindex="0" aria-label="Livelli di ingresso. Tocca per azzerare gli indicatori di clip."></canvas>
-    <div class="transport">
-      <div class="side">
-        <button class="mk" id="btnMark" disabled aria-label="Aggiungi marker">MARK</button>
+  <!-- ================= RIPRODUCI ================= -->
+  <div class="view" id="viewPlay" hidden>
+    <section class="panel" aria-label="Riproduttore">
+      <div class="pl-head">
+        <div class="pl-name" id="plName">Nessun nastro caricato</div>
+        <div class="pl-time" id="plTime">0:00.0 / 0:00</div>
       </div>
-      <div>
-        <button class="rec" id="btnRec" data-on="false" disabled aria-label="Registra"><i></i></button>
-        <div class="reclabel" id="recLabel">REC</div>
-      </div>
-      <div class="side" id="bufInfo">pre-roll<br>—</div>
-    </div>
-    <p class="markers" id="markersLine"></p>
-  </section>
+      <canvas id="plWave" aria-label="Posizione nel nastro. Tocca o trascina per spostarti."></canvas>
+      <div class="marks" id="plMarks"></div>
 
-  <section class="panel" aria-label="Impostazioni">
-    <h2>Impostazioni</h2>
-    <div class="field" style="margin-top:0">
-      <span id="lblBits">Profondità</span>
-      <div class="seg" id="segBits" role="group" aria-labelledby="lblBits">
-        <button type="button" data-v="16">16 bit</button>
-        <button type="button" data-v="24">24 bit</button>
+      <div class="platter" id="platter" role="slider" tabindex="0" aria-label="Piatto. Trascina in cerchio per scorrere il nastro." aria-disabled="true">
+        <canvas id="platterC"></canvas>
       </div>
-    </div>
-    <div class="field">
-      <span id="lblPre">Pre-roll (registra anche i secondi prima del tocco)</span>
-      <div class="seg" id="segPre" role="group" aria-labelledby="lblPre">
-        <button type="button" data-v="0">No</button>
-        <button type="button" data-v="10">10 s</button>
-        <button type="button" data-v="20">20 s</button>
-      </div>
-    </div>
-  </section>
+      <p class="hint" id="plHint">Carica un nastro dall'elenco qui sotto</p>
 
-  <section aria-label="Registrazioni">
-    <div class="listhead"><h2>Registrazioni</h2><span class="meta" id="listMeta"></span></div>
-    <div id="list"></div>
-    <p class="foot">Durante l'ascolto l'ingresso si spegne, così il telefono mantiene il volume normale. Per usare la pagina a tutto schermo, aggiungila alla schermata Home da Safari.</p>
-  </section>
+      <div class="ptransport">
+        <button class="tbtn" id="btnStart" disabled aria-label="Torna all'inizio"><svg viewBox="0 0 24 24"><path d="M5 5h2.5v14H5zM9 12l10-7v14z"/></svg></button>
+        <button class="tbtn" id="btnRev" disabled aria-pressed="false">REV</button>
+        <button class="pplay" id="btnPlay" disabled aria-label="Riproduci"><svg id="icoPlay" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></button>
+        <button class="tbtn" id="btnIn" disabled>IN</button>
+        <button class="tbtn" id="btnOut" disabled>OUT</button>
+        <button class="tbtn" id="btnLoop" disabled aria-pressed="false">LOOP</button>
+      </div>
+
+      <div class="knobs" id="knobs" data-off="true"></div>
+    </section>
+
+    <section aria-label="Nastri">
+      <div class="listhead"><h2>Nastri</h2><span class="meta" id="listMeta"></span></div>
+      <div id="list"></div>
+      <p class="foot">Mentre ascolti, l'ingresso si spegne così il telefono mantiene il volume normale. Per usare la pagina a tutto schermo, aggiungila alla schermata Home da Safari.</p>
+    </section>
+  </div>
 </main>
 
 <script>
@@ -204,13 +283,17 @@ canvas.wave { width: 100%; height: 56px; display: block; background: var(--panna
 'use strict';
 const $ = (id) => document.getElementById(id);
 const AC = window.AudioContext || window.webkitAudioContext;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 /* ---------- impostazioni ---------- */
 const store = {
   get(k, d) { try { const v = localStorage.getItem('reg.' + k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
   set(k, v) { try { localStorage.setItem('reg.' + k, JSON.stringify(v)); } catch (e) {} }
 };
-const S = { mode: store.get('mode', 'stereo'), bits: store.get('bits', 24), pre: store.get('pre', 10), gain: store.get('gain', 0), dev: store.get('dev', null) };
+const S = {
+  mode: store.get('mode', 'stereo'), bits: store.get('bits', 24), pre: store.get('pre', 10), gain: store.get('gain', 0), dev: store.get('dev', null),
+  fxComp: store.get('fxComp', false), fxTape: store.get('fxTape', false), tab: 'rec', knobs: store.get('knobs', {})
+};
 
 /* ---------- archivio (IndexedDB) ---------- */
 let dbp = null, storageOK = true;
@@ -283,15 +366,21 @@ $('bannerAct').addEventListener('click', () => { const f = bannerFn; $('banner')
 /* ---------- utilità ---------- */
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const fmt = (s) => { s = Math.max(0, s); const m = Math.floor(s / 60), r = Math.floor(s % 60); return m + ':' + String(r).padStart(2, '0'); };
+const fmtT = (s) => { s = Math.max(0, s); return fmt(s) + '.' + Math.floor((s % 1) * 10); };
 const mb = (b) => (b / 1048576).toFixed(b > 10485760 ? 0 : 1) + ' MB';
 const safe = (n) => (n || 'registrazione').replace(/[\\/:*?"<>|]/g, '-');
-const defaultName = (d) => 'Registrazione ' + d.toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '');
-
-/* ---------- ingresso audio ---------- */
-function effMode() {
-  if (inputCh < 2 && S.mode !== 'l') return 'l';
-  return S.mode;
+const defaultName = (d) => 'Nastro ' + d.toLocaleString('it-IT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(',', '');
+function ensureCtx() {
+  if (ctx) return;
+  try { ctx = new AC({ sampleRate: 48000, latencyHint: 'interactive' }); } catch (e) { ctx = new AC({ latencyHint: 'interactive' }); }
+  ctx.onstatechange = onCtxState;
+  buildPlayer();
 }
+
+/* ======================================================================
+   INGRESSO
+   ====================================================================== */
+function effMode() { return (inputCh < 2 && S.mode !== 'l') ? 'l' : S.mode; }
 function gum(audio) { return navigator.mediaDevices.getUserMedia({ audio }); }
 
 async function refreshDevices(currentId) {
@@ -309,21 +398,40 @@ async function refreshDevices(currentId) {
   } catch (e) {}
 }
 
+function satCurve(k) {
+  const n = 2048, c = new Float32Array(n), norm = Math.tanh(k);
+  for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = Math.tanh(k * x) / norm; }
+  return c;
+}
+
 function buildGraph() {
   if (nodes.worklet) return;
   nodes.inGain = ctx.createGain();
+  nodes.comp = ctx.createDynamicsCompressor();
+  nodes.comp.threshold.value = -20; nodes.comp.knee.value = 8; nodes.comp.ratio.value = 4; nodes.comp.attack.value = 0.008; nodes.comp.release.value = 0.18;
+  nodes.makeup = ctx.createGain(); nodes.makeup.gain.value = Math.pow(10, 5 / 20);
+  nodes.sat = ctx.createWaveShaper(); nodes.sat.curve = satCurve(1.8); nodes.sat.oversample = '2x';
+  nodes.shelf = ctx.createBiquadFilter(); nodes.shelf.type = 'highshelf'; nodes.shelf.frequency.value = 9000; nodes.shelf.gain.value = -1.5;
   nodes.mon = ctx.createGain();
   nodes.mon.gain.value = $('chkMon').checked ? 1 : 0;
   nodes.silent = ctx.createGain();
   nodes.silent.gain.value = 0;
   nodes.worklet = new AudioWorkletNode(ctx, 'cap', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1] });
   nodes.worklet.port.onmessage = (ev) => onChunk(ev.data.l, ev.data.r);
-  nodes.inGain.connect(nodes.worklet);
   nodes.worklet.connect(nodes.silent);
   nodes.silent.connect(ctx.destination);
-  nodes.inGain.connect(nodes.mon);
   nodes.mon.connect(ctx.destination);
   applyGain();
+  route();
+}
+function route() {
+  if (!nodes.inGain) return;
+  [nodes.inGain, nodes.comp, nodes.makeup, nodes.sat, nodes.shelf].forEach((n) => { try { n.disconnect(); } catch (e) {} });
+  let last = nodes.inGain;
+  if (S.fxComp) { last.connect(nodes.comp); nodes.comp.connect(nodes.makeup); last = nodes.makeup; }
+  if (S.fxTape) { last.connect(nodes.sat); nodes.sat.connect(nodes.shelf); last = nodes.shelf; }
+  last.connect(nodes.worklet);
+  last.connect(nodes.mon);
 }
 function applyGain() { if (nodes.inGain) nodes.inGain.gain.value = Math.pow(10, S.gain / 20); }
 
@@ -334,11 +442,9 @@ async function startInput() {
   }
   if (rec) return;
   try {
+    stopPlay();
     releaseInput();
-    if (!ctx) {
-      try { ctx = new AC({ sampleRate: 48000, latencyHint: 'interactive' }); } catch (e) { ctx = new AC({ latencyHint: 'interactive' }); }
-      ctx.onstatechange = onCtxState;
-    }
+    ensureCtx();
     ctx.resume().catch(() => {});
     const base = { echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 2 }, sampleRate: { ideal: 48000 } };
     try {
@@ -524,7 +630,10 @@ async function stopRec(msg) {
   try {
     await flush(r); await flushChain;
     const take = await buildTake({ sid: r.sid, sr: r.sr, ch: r.ch, bits: r.bits, startedAt: r.startedAt.getTime() }, r.env, r.markers);
-    if (take) { takes.unshift(take); renderList(); banner(msg || ('Salvata: ' + take.name)); }
+    if (take) {
+      takes.unshift(take); renderList();
+      banner(msg || ('Salvato: ' + take.name), { label: 'Apri nel player', fn: () => loadTake(take.id) });
+    }
   } catch (e) {
     banner('Salvataggio non riuscito (' + ((e && e.message) || e) + '). I dati restano nel browser e si possono recuperare al prossimo avvio.');
   }
@@ -545,10 +654,317 @@ function unlock() { if (wl) { wl.release().catch(() => {}); wl = null; } }
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState !== 'visible') return;
   if (rec && !wl) lock();
-  if (inputOn && ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+  if ((inputOn || P.mode !== 'stopped') && ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
 });
 
-/* ---------- interfaccia ---------- */
+/* ======================================================================
+   PLAYER (piatto, scrub a nastro, velocità, loop, effetti)
+   ====================================================================== */
+const REV_SEC = 1.8;                 // un giro di piatto = 1,8 s di nastro a velocità 1
+const PL = {};                       // nodi audio del player
+const P = { take: null, buf: null, rev: null, pos: 0, srcPos: 0, mode: 'stopped', dirRev: false, target: 1, srcRate: 1, src: null, sg: null, srcRev: false, lastCt: 0, loop: { on: false, a: 0, b: 0 }, scrubV: 0, lastMove: 0, wasPlaying: false, setT: 1 };
+
+const KNOBS = [
+  { id: 'speed', label: 'SPEED', def: 1, min: 0.5, max: 2, type: 'exp', detent: 1, fmt: (v) => v.toFixed(2) + '×' },
+  { id: 'tone', label: 'TONE', def: 20000, min: 500, max: 20000, type: 'exp', fmt: (v) => v >= 1000 ? (v / 1000).toFixed(v >= 10000 ? 0 : 1) + 'k' : Math.round(v) + '' },
+  { id: 'drive', label: 'DRIVE', def: 0, min: 0, max: 1, type: 'lin', fmt: (v) => Math.round(v * 100) + '%' },
+  { id: 'wow', label: 'WOW', def: 0, min: 0, max: 1, type: 'lin', fmt: (v) => Math.round(v * 100) + '%' },
+  { id: 'echo', label: 'ECHO', def: 0, min: 0, max: 1, type: 'lin', fmt: (v) => Math.round(v * 100) + '%' },
+  { id: 'time', label: 'TIME', def: 280, min: 40, max: 800, type: 'exp', fmt: (v) => Math.round(v) + ' ms' },
+  { id: 'feed', label: 'FEED', def: 0.4, min: 0, max: 0.92, type: 'lin', fmt: (v) => Math.round(v / 0.92 * 100) + '%' },
+  { id: 'vol', label: 'VOL', def: 1, min: 0, max: 1.5, type: 'lin', fmt: (v) => v < 0.01 ? '−∞' : (20 * Math.log10(v)).toFixed(1) + ' dB' }
+];
+const KV = {};                       // valori correnti
+KNOBS.forEach((k) => { KV[k.id] = typeof S.knobs[k.id] === 'number' ? S.knobs[k.id] : k.def; });
+const toNorm = (k, v) => k.type === 'exp' ? Math.log(v / k.min) / Math.log(k.max / k.min) : (v - k.min) / (k.max - k.min);
+const fromNorm = (k, n) => k.type === 'exp' ? k.min * Math.pow(k.max / k.min, n) : k.min + (k.max - k.min) * n;
+
+function buildPlayer() {
+  if (PL.in) return;
+  PL.in = ctx.createGain();
+  PL.sat = ctx.createWaveShaper(); PL.sat.oversample = '2x';
+  PL.trim = ctx.createGain();
+  PL.tone = ctx.createBiquadFilter(); PL.tone.type = 'lowpass'; PL.tone.Q.value = 0.5;
+  PL.dly = ctx.createDelay(1.5);
+  PL.dlyTone = ctx.createBiquadFilter(); PL.dlyTone.type = 'lowpass'; PL.dlyTone.frequency.value = 3200;
+  PL.fb = ctx.createGain(); PL.wet = ctx.createGain(); PL.master = ctx.createGain();
+  PL.in.connect(PL.sat); PL.sat.connect(PL.trim); PL.trim.connect(PL.tone); PL.tone.connect(PL.master);
+  PL.tone.connect(PL.dly); PL.dly.connect(PL.dlyTone); PL.dlyTone.connect(PL.fb); PL.fb.connect(PL.dly);
+  PL.dlyTone.connect(PL.wet); PL.wet.connect(PL.master); PL.master.connect(ctx.destination);
+  PL.bus = ctx.createGain();
+  PL.o1 = ctx.createOscillator(); PL.o1.frequency.value = 0.7; PL.g1 = ctx.createGain(); PL.o1.connect(PL.g1); PL.g1.connect(PL.bus);
+  PL.o2 = ctx.createOscillator(); PL.o2.frequency.value = 5.3; PL.g2 = ctx.createGain(); PL.o2.connect(PL.g2); PL.g2.connect(PL.bus);
+  PL.o1.start(); PL.o2.start();
+  KNOBS.forEach((k) => applyKnob(k.id, KV[k.id], true));
+}
+
+function applyKnob(id, v, instant) {
+  P.target = id === 'speed' ? v : P.target;
+  if (!PL.in) return;
+  const t = ctx.currentTime, tau = instant ? 0.001 : 0.03;
+  switch (id) {
+    case 'tone': PL.tone.frequency.setTargetAtTime(v, t, tau); break;
+    case 'drive': PL.sat.curve = v < 0.01 ? null : satCurve(1 + v * 7); PL.trim.gain.value = 1 - 0.3 * v; break;
+    case 'wow': PL.g1.gain.value = v * 30; PL.g2.gain.value = v * 6; break;
+    case 'echo': PL.wet.gain.setTargetAtTime(v * 0.9, t, tau); break;
+    case 'time': PL.dly.delayTime.setTargetAtTime(v / 1000, t, 0.08); break;
+    case 'feed': PL.fb.gain.setTargetAtTime(v, t, tau); break;
+    case 'vol': PL.master.gain.setTargetAtTime(v, t, tau); break;
+    default: break;
+  }
+}
+
+function decode(ab) {
+  return new Promise((res, rej) => { const p = ctx.decodeAudioData(ab, res, rej); if (p && p.catch) p.catch(rej); });
+}
+function getRev() {
+  if (P.rev) return P.rev;
+  const b = P.buf, r = ctx.createBuffer(b.numberOfChannels, b.length, b.sampleRate);
+  for (let c = 0; c < b.numberOfChannels; c++) {
+    const s = b.getChannelData(c), d = r.getChannelData(c), n = s.length;
+    for (let i = 0; i < n; i++) d[i] = s[n - 1 - i];
+  }
+  P.rev = r; return r;
+}
+
+async function loadTake(id) {
+  const t = takes.find((x) => x.id === id); if (!t) return;
+  if (rec) { banner('Ferma la registrazione prima di aprire un nastro nel player.'); return; }
+  try {
+    ensureCtx();
+    if (inputOn) releaseInput();
+    stopPlay();
+    setTab('play');
+    $('plHint').textContent = 'Carico il nastro…';
+    ctx.resume().catch(() => {});
+    const buf = await decode(await t.blob.arrayBuffer());
+    P.take = t; P.buf = buf; P.rev = null; P.pos = 0; P.srcPos = 0; P.mode = 'stopped';
+    P.loop = { on: false, a: 0, b: buf.duration };
+    updatePlayerUI(); renderList();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (e) {
+    $('plHint').textContent = 'Carica un nastro dall\'elenco qui sotto';
+    banner('Impossibile aprire il nastro nel player (' + ((e && e.message) || 'formato non leggibile') + ').');
+  }
+}
+function unloadTake() { stopPlay(); P.take = null; P.buf = null; P.rev = null; P.pos = 0; updatePlayerUI(); }
+
+function stopSrc() {
+  const s = P.src; if (!s) return;
+  const t = ctx.currentTime;
+  try { P.sg.gain.cancelScheduledValues(t); P.sg.gain.setTargetAtTime(0, t, 0.006); } catch (e) {}
+  try { PL.bus.disconnect(s.detune); } catch (e) {}
+  try { s.onended = null; s.stop(t + 0.05); } catch (e) {}
+  P.src = null; P.sg = null;
+}
+
+function startSrc(rate, reverse, mute) {
+  stopSrc();
+  if (!P.buf) return;
+  const buf = reverse ? getRev() : P.buf, dur = P.buf.duration;
+  const looping = P.mode === 'playing' && P.loop.on && P.loop.b - P.loop.a > 0.05;
+  if (looping && (P.pos < P.loop.a || P.pos >= P.loop.b)) P.pos = P.loop.a;
+  P.srcPos = P.pos;
+  const s = ctx.createBufferSource();
+  s.buffer = buf; s.playbackRate.value = rate;
+  if (looping) {
+    s.loop = true;
+    if (!reverse) { s.loopStart = P.loop.a; s.loopEnd = P.loop.b; } else { s.loopStart = dur - P.loop.b; s.loopEnd = dur - P.loop.a; }
+  }
+  const sg = ctx.createGain(); sg.gain.value = mute ? 0 : 1;
+  s.connect(sg); sg.connect(PL.in);
+  try { PL.bus.connect(s.detune); } catch (e) {}
+  s.onended = () => {
+    if (P.src !== s) return;
+    P.src = null; P.sg = null;
+    if (P.mode === 'playing') { P.mode = 'stopped'; P.pos = reverse ? 0 : dur; updatePlayerUI(); }
+  };
+  const off = reverse ? dur - P.srcPos : P.srcPos;
+  s.start(0, clamp(off, 0, buf.duration - 0.001));
+  P.src = s; P.sg = sg; P.srcRev = reverse; P.srcRate = rate; P.lastCt = ctx.currentTime; P.setT = rate;
+}
+
+function tickPlayer() {
+  if (!ctx || !P.buf) return;
+  const ct = ctx.currentTime;
+  if (P.src) {
+    const dt = clamp(ct - P.lastCt, 0, 0.2); P.lastCt = ct;
+    if (P.mode === 'playing') {
+      if (P.setT !== P.target) { P.src.playbackRate.setTargetAtTime(P.target, ct, 0.05); P.setT = P.target; }
+      P.srcRate += (P.target - P.srcRate) * (1 - Math.exp(-dt / 0.05));
+    }
+    P.srcPos += dt * P.srcRate * (P.srcRev ? -1 : 1);
+    const L = P.loop;
+    if (P.mode === 'playing' && L.on && L.b - L.a > 0.05) {
+      if (!P.srcRev && P.srcPos >= L.b) P.srcPos = L.a + (P.srcPos - L.a) % (L.b - L.a);
+      if (P.srcRev && P.srcPos <= L.a) P.srcPos = L.b - (L.a - P.srcPos) % (L.b - L.a);
+    }
+    P.srcPos = clamp(P.srcPos, 0, P.buf.duration);
+    if (P.mode === 'playing') P.pos = P.srcPos;
+  }
+  if (P.mode === 'scrub' && P.scrubV !== 0 && performance.now() - P.lastMove > 70) { P.scrubV = 0; applyScrub(); }
+}
+
+async function play() {
+  if (!P.buf) return;
+  if (rec) { banner('Ferma la registrazione prima di ascoltare.'); return; }
+  if (inputOn) releaseInput();
+  ensureCtx();
+  try { await ctx.resume(); } catch (e) {}
+  if (!P.dirRev && P.pos >= P.buf.duration - 0.02) P.pos = 0;
+  if (P.dirRev && P.pos <= 0.02) P.pos = P.buf.duration;
+  P.mode = 'playing';
+  startSrc(P.target, P.dirRev, false);
+  updatePlayerUI();
+}
+function stopPlay() {
+  if (!ctx || P.mode === 'stopped') { P.mode = 'stopped'; return; }
+  P.mode = 'stopped'; stopSrc(); updatePlayerUI();
+}
+function restartPlay() { if (P.mode === 'playing') startSrc(P.target, P.dirRev, false); }
+function seekTo(t) {
+  if (!P.buf) return;
+  P.pos = clamp(t, 0, P.buf.duration); P.srcPos = P.pos;
+  if (P.mode === 'playing') restartPlay();
+}
+
+/* scrub: il piatto sposta il nastro, la velocità del dito diventa velocità del nastro */
+function applyScrub() {
+  if (!P.buf || P.mode !== 'scrub') return;
+  const v = P.scrubV, mag = Math.min(4, Math.abs(v)), rev = v < 0, t = ctx.currentTime;
+  if (mag < 0.05) { if (P.sg) P.sg.gain.setTargetAtTime(0, t, 0.01); return; }
+  if (!P.src || P.srcRev !== rev || Math.abs(P.srcPos - P.pos) > 0.15) startSrc(mag, rev, false);
+  else { P.srcRate = mag; P.src.playbackRate.setTargetAtTime(mag, t, 0.02); P.sg.gain.setTargetAtTime(1, t, 0.01); }
+}
+function scrubStart() {
+  if (!P.buf) return false;
+  ensureCtx(); if (inputOn) releaseInput();
+  ctx.resume().catch(() => {});
+  P.wasPlaying = P.mode === 'playing';
+  if (P.wasPlaying) P.pos = P.srcPos;
+  P.mode = 'scrub'; P.scrubV = 0; applyScrub();
+  return true;
+}
+function scrubMove(dpos, dtms) {
+  const v = dtms > 0 ? dpos / (dtms / 1000) : 0;
+  P.scrubV = P.scrubV * 0.5 + v * 0.5;
+  P.pos = clamp(P.pos + dpos, 0, P.buf.duration);
+  P.lastMove = performance.now();
+  applyScrub();
+}
+function scrubEnd() {
+  if (P.mode !== 'scrub') return;
+  P.scrubV = 0; stopSrc();
+  if (P.wasPlaying) { P.mode = 'playing'; startSrc(P.target, P.dirRev, false); } else P.mode = 'stopped';
+  updatePlayerUI();
+}
+
+/* piatto: gesto circolare */
+const platter = $('platter');
+let jog = null;
+const angleOf = (e) => { const r = platter.getBoundingClientRect(); return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)); };
+platter.addEventListener('pointerdown', (e) => {
+  if (!P.buf) return;
+  e.preventDefault();
+  try { platter.setPointerCapture(e.pointerId); } catch (x) {}
+  if (!scrubStart()) return;
+  jog = { a: angleOf(e), t: performance.now() };
+});
+platter.addEventListener('pointermove', (e) => {
+  if (!jog) return;
+  const a = angleOf(e), now = performance.now();
+  let da = a - jog.a;
+  if (da > Math.PI) da -= 2 * Math.PI; else if (da < -Math.PI) da += 2 * Math.PI;
+  scrubMove(da / (2 * Math.PI) * REV_SEC, now - jog.t);
+  jog.a = a; jog.t = now;
+});
+const endJog = () => { if (!jog) return; jog = null; scrubEnd(); };
+platter.addEventListener('pointerup', endJog);
+platter.addEventListener('pointercancel', endJog);
+
+/* barra forma d'onda: tocca o trascina per spostarti */
+const plWave = $('plWave');
+let seeking = false;
+const seekFromEvent = (e) => { const r = plWave.getBoundingClientRect(); seekTo(clamp((e.clientX - r.left) / r.width, 0, 1) * P.buf.duration); };
+plWave.addEventListener('pointerdown', (e) => { if (!P.buf) return; seeking = true; try { plWave.setPointerCapture(e.pointerId); } catch (x) {} seekFromEvent(e); });
+plWave.addEventListener('pointermove', (e) => { if (seeking) seekFromEvent(e); });
+plWave.addEventListener('pointerup', () => { seeking = false; });
+plWave.addEventListener('pointercancel', () => { seeking = false; });
+
+/* pulsanti */
+$('btnPlay').addEventListener('click', () => { if (P.mode === 'playing') stopPlay(); else play(); });
+$('btnStart').addEventListener('click', () => seekTo(P.dirRev && P.buf ? P.buf.duration : 0));
+$('btnRev').addEventListener('click', () => { P.dirRev = !P.dirRev; updatePlayerUI(); restartPlay(); });
+$('btnIn').addEventListener('click', () => { if (!P.buf) return; P.loop.a = Math.min(P.pos, P.buf.duration - 0.1); if (P.loop.b <= P.loop.a + 0.05) P.loop.b = P.buf.duration; P.loop.on = true; updatePlayerUI(); restartPlay(); });
+$('btnOut').addEventListener('click', () => { if (!P.buf) return; P.loop.b = Math.max(P.pos, 0.1); if (P.loop.a >= P.loop.b - 0.05) P.loop.a = 0; P.loop.on = true; updatePlayerUI(); restartPlay(); });
+$('btnLoop').addEventListener('click', () => { if (!P.buf) return; P.loop.on = !P.loop.on; if (P.loop.on && P.loop.b - P.loop.a < 0.05) { P.loop.a = 0; P.loop.b = P.buf.duration; } updatePlayerUI(); restartPlay(); });
+
+function updatePlayerUI() {
+  const has = !!P.buf;
+  $('plName').textContent = has ? P.take.name : 'Nessun nastro caricato';
+  ['btnStart', 'btnRev', 'btnPlay', 'btnIn', 'btnOut', 'btnLoop'].forEach((id) => { $(id).disabled = !has; });
+  $('btnRev').setAttribute('aria-pressed', String(P.dirRev));
+  $('btnLoop').setAttribute('aria-pressed', String(has && P.loop.on));
+  $('icoPlay').innerHTML = P.mode === 'playing' ? '<path d="M6 4h4.5v16H6zM13.5 4H18v16h-4.5z"/>' : '<path d="M7 4l13 8-13 8z"/>';
+  $('btnPlay').setAttribute('aria-label', P.mode === 'playing' ? 'Pausa' : 'Riproduci');
+  platter.setAttribute('aria-disabled', String(!has));
+  $('knobs').dataset.off = String(!has);
+  $('plHint').textContent = has ? 'Trascina il piatto in cerchio per scorrere il nastro' : 'Carica un nastro dall\'elenco qui sotto';
+  $('plMarks').innerHTML = has ? P.take.markers.map((m, i) => '<button class="chip" data-t="' + m + '">M' + (i + 1) + ' ' + fmt(m) + '</button>').join('') : '';
+}
+$('plMarks').addEventListener('click', (e) => { const b = e.target.closest('button[data-t]'); if (b) seekTo(Number(b.dataset.t)); });
+
+/* manopole */
+function buildKnobs() {
+  const host = $('knobs');
+  host.innerHTML = KNOBS.map((k) => '<div class="knob" tabindex="0" role="slider" data-id="' + k.id + '" aria-label="' + k.label + '">' +
+    '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="#FAF6E9" stroke="#262219" stroke-width="2"/>' +
+    '<circle cx="32" cy="32" r="20" fill="#EFE7D0" stroke="#DAD0B6" stroke-width="1"/>' +
+    '<line class="ki" x1="32" y1="32" x2="32" y2="9" stroke="#EC4A1A" stroke-width="3.5" stroke-linecap="round"/></svg>' +
+    '<div class="kl">' + k.label + '</div><div class="kv"></div></div>').join('');
+  host.querySelectorAll('.knob').forEach((el) => {
+    const k = KNOBS.find((x) => x.id === el.dataset.id);
+    const draw = () => {
+      const n = clamp(toNorm(k, KV[k.id]), 0, 1);
+      el.querySelector('.ki').setAttribute('transform', 'rotate(' + (-135 + n * 270) + ' 32 32)');
+      el.querySelector('.kv').textContent = k.fmt(KV[k.id]);
+      el.setAttribute('aria-valuenow', String(Math.round(n * 100)));
+    };
+    const set = (n) => {
+      n = clamp(n, 0, 1);
+      if (k.detent && Math.abs(n - toNorm(k, k.detent)) < 0.025) n = toNorm(k, k.detent);
+      KV[k.id] = fromNorm(k, n);
+      if (k.detent && n === toNorm(k, k.detent)) KV[k.id] = k.detent;
+      S.knobs[k.id] = KV[k.id]; store.set('knobs', S.knobs);
+      applyKnob(k.id, KV[k.id]); draw();
+    };
+    let drag = null;
+    el.addEventListener('pointerdown', (e) => { e.preventDefault(); try { el.setPointerCapture(e.pointerId); } catch (x) {} drag = { y: e.clientY, n: toNorm(k, KV[k.id]) }; });
+    el.addEventListener('pointermove', (e) => { if (drag) set(drag.n + (drag.y - e.clientY) / 150); });
+    el.addEventListener('pointerup', () => { drag = null; });
+    el.addEventListener('pointercancel', () => { drag = null; });
+    el.addEventListener('dblclick', () => set(toNorm(k, k.def)));
+    el.addEventListener('keydown', (e) => {
+      const n = toNorm(k, KV[k.id]);
+      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') { set(n + 0.02); e.preventDefault(); }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { set(n - 0.02); e.preventDefault(); }
+    });
+    draw();
+  });
+}
+
+/* ======================================================================
+   INTERFACCIA
+   ====================================================================== */
+function setTab(v) {
+  S.tab = v;
+  $('viewRec').hidden = v !== 'rec';
+  $('viewPlay').hidden = v !== 'play';
+  document.querySelectorAll('#tabs button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === v)));
+  if (v === 'play') requestAnimationFrame(() => { drawAllWaves(); });
+}
+$('tabs').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) setTab(b.dataset.v); });
+
 function updateUI() {
   const pill = $('pill');
   if (rec) { pill.dataset.s = 'rec'; pill.textContent = 'REC'; }
@@ -568,6 +984,7 @@ function updateUI() {
   document.querySelectorAll('#segMode button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === S.mode)));
   document.querySelectorAll('#segBits button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === S.bits)));
   document.querySelectorAll('#segPre button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.v) === S.pre)));
+  document.querySelectorAll('#segFx button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.fx === 'comp' ? S.fxComp : S.fxTape)));
   $('selDevice').disabled = !!rec;
   if (!rec) updateMarkersLine();
   if (ctx) updateInfo(); else $('specs').textContent = 'WAV ' + S.bits + ' bit · 48 kHz';
@@ -585,6 +1002,11 @@ $('segPre').addEventListener('click', (e) => {
   if (S.pre === 0) { ring = []; ringFrames = 0; }
   updateUI();
 });
+$('segFx').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.fx === 'comp') { S.fxComp = !S.fxComp; store.set('fxComp', S.fxComp); } else { S.fxTape = !S.fxTape; store.set('fxTape', S.fxTape); }
+  route(); updateUI();
+});
 $('gain').addEventListener('input', (e) => {
   S.gain = Number(e.target.value); store.set('gain', S.gain);
   $('gainOut').textContent = (S.gain > 0 ? '+' : '') + S.gain.toFixed(1) + ' dB';
@@ -595,16 +1017,158 @@ if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
   navigator.mediaDevices.addEventListener('devicechange', () => { if (inputOn && stream) { const t = stream.getAudioTracks()[0]; refreshDevices(t && t.getSettings().deviceId); } });
 }
 
-/* ---------- misuratore ---------- */
-const meterC = $('meter'), mg = meterC.getContext('2d');
-const mState = { l: { d: -90, hold: -90, holdT: 0, clip: false }, r: { d: -90, hold: -90, holdT: 0, clip: false } };
+/* ---------- disegno ---------- */
 const css = getComputedStyle(document.documentElement);
-const COL = { ink: css.getPropertyValue('--inchiostro').trim(), mute: css.getPropertyValue('--tenue').trim(), line: css.getPropertyValue('--linea').trim(), track: '#E9E0C8', ok: css.getPropertyValue('--ok').trim(), amb: css.getPropertyValue('--ambra').trim(), rec: css.getPropertyValue('--rec').trim() };
-const DBMIN = -60;
+const COL = { ink: css.getPropertyValue('--inchiostro').trim(), mute: css.getPropertyValue('--tenue').trim(), line: css.getPropertyValue('--linea').trim(), card: css.getPropertyValue('--carta').trim(), pan: css.getPropertyValue('--panna').trim(), ok: css.getPropertyValue('--ok').trim(), amb: css.getPropertyValue('--ambra').trim(), rec: css.getPropertyValue('--rec').trim(), dial: '#F8F2DF', tape: '#7A5A44' };
+const MONO = 'IBM Plex Mono, ui-monospace, monospace';
+function fit(c, h) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 3), w = c.clientWidth;
+  if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
+  const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { g, w, h };
+}
+function rrect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+
+/* strumenti a lancetta */
+const meterC = $('meter');
+const mState = { l: { d: -90, hold: -90, holdT: 0, clip: false }, r: { d: -90, hold: -90, holdT: 0, clip: false } };
 meterC.addEventListener('click', () => { mState.l.clip = false; mState.r.clip = false; });
 meterC.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { mState.l.clip = false; mState.r.clip = false; e.preventDefault(); } });
+const dbAng = (db) => (-50 + (clamp(db, -42, 0) + 42) / 42 * 94) * Math.PI / 180;
 
-let lastTs = 0, lastTimer = '', lastBuf = '';
+function drawDials() {
+  const { g, w, h } = fit(meterC, 108);
+  g.clearRect(0, 0, w, h);
+  const gap = 10, fw = (w - gap) / 2, fh = 104, y0 = 2;
+  const mode = effMode();
+  [['l', 'L', 0], ['r', 'R', 1]].forEach(([k, name, i]) => {
+    const s = mState[k], x0 = i * (fw + gap), cx = x0 + fw / 2, cy = y0 + fh + 20, Rs = fh - 14;
+    const dim = (mode === 'l' && k === 'r') || (mode === 'r' && k === 'l') || !inputOn;
+    g.save();
+    g.globalAlpha = dim ? 0.4 : 1;
+    rrect(g, x0, y0, fw, fh, 10); g.fillStyle = COL.dial; g.fill(); g.strokeStyle = COL.line; g.lineWidth = 1; g.stroke();
+    g.save(); rrect(g, x0, y0, fw, fh, 10); g.clip();
+    // scala
+    g.strokeStyle = COL.ink; g.lineWidth = 1.2;
+    g.beginPath(); g.arc(cx, cy, Rs, -Math.PI / 2 + dbAng(-40), -Math.PI / 2 + dbAng(-6)); g.stroke();
+    g.strokeStyle = COL.rec; g.lineWidth = 3.5;
+    g.beginPath(); g.arc(cx, cy, Rs, -Math.PI / 2 + dbAng(-6), -Math.PI / 2 + dbAng(0)); g.stroke();
+    g.fillStyle = COL.ink; g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '9px ' + MONO;
+    [-40, -30, -20, -10, -6, -3, 0].forEach((db) => {
+      const a = dbAng(db), sn = Math.sin(a), cs = Math.cos(a);
+      g.strokeStyle = db >= -6 ? COL.rec : COL.ink; g.lineWidth = 1.2;
+      g.beginPath(); g.moveTo(cx + (Rs - 6) * sn, cy - (Rs - 6) * cs); g.lineTo(cx + (Rs + 1) * sn, cy - (Rs + 1) * cs); g.stroke();
+      g.fillText(String(db), cx + (Rs + 10) * sn, cy - (Rs + 10) * cs);
+    });
+    g.strokeStyle = COL.mute; g.lineWidth = 1;
+    [-35, -25, -15, -8, -1.5].forEach((db) => { const a = dbAng(db), sn = Math.sin(a), cs = Math.cos(a); g.beginPath(); g.moveTo(cx + (Rs - 3) * sn, cy - (Rs - 3) * cs); g.lineTo(cx + (Rs + 1) * sn, cy - (Rs + 1) * cs); g.stroke(); });
+    // picco trattenuto
+    if (s.hold > -41) {
+      const a = dbAng(s.hold), sn = Math.sin(a), cs = Math.cos(a);
+      g.strokeStyle = COL.amb; g.lineWidth = 3;
+      g.beginPath(); g.moveTo(cx + (Rs - 11) * sn, cy - (Rs - 11) * cs); g.lineTo(cx + (Rs - 5) * sn, cy - (Rs - 5) * cs); g.stroke();
+    }
+    // lancetta
+    const a = dbAng(s.d), Ln = Rs + 6;
+    g.strokeStyle = COL.ink; g.lineWidth = 1.8; g.lineCap = 'round';
+    g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + Ln * Math.sin(a), cy - Ln * Math.cos(a)); g.stroke();
+    g.restore();
+    // etichette e clip
+    g.fillStyle = COL.mute; g.font = '10px ' + MONO; g.textAlign = 'left'; g.textBaseline = 'middle';
+    g.fillText(name, x0 + 10, y0 + 12);
+    g.fillStyle = s.clip ? COL.rec : COL.line; g.beginPath(); g.arc(x0 + fw - 14, y0 + 12, 5, 0, 6.2832); g.fill();
+    g.fillStyle = COL.ink; g.font = '11px ' + MONO; g.textAlign = 'left';
+    g.fillText(s.hold > -89 ? s.hold.toFixed(1) : '--', x0 + 10, y0 + fh - 10);
+    g.fillStyle = COL.mute; g.font = '9px ' + MONO; g.textAlign = 'right';
+    g.fillText('dBFS', x0 + fw - 10, y0 + fh - 10);
+    g.restore();
+  });
+}
+
+/* bobine */
+const tapeC = $('tape');
+const reel = { th: 0, w: 0, f: 0.3 };
+function drawTape(dt) {
+  const { g, w, h } = fit(tapeC, 64);
+  g.clearRect(0, 0, w, h);
+  const spinning = !!rec;
+  reel.w += ((spinning ? 3.4 : 0) - reel.w) * (1 - Math.exp(-dt / 0.3));
+  reel.th += reel.w * dt;
+  const f = rec ? Math.min(1, rec.frames / rec.sr / 1800) : reel.f;
+  reel.f = f;
+  const xl = w * 0.27, xr = w * 0.73, cy = 30;
+  const rl = 11 + 16 * (1 - f), rr = 11 + 16 * f;
+  // nastro verso la testina
+  g.strokeStyle = COL.tape; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(xl, cy + rl); g.lineTo(w / 2 - 14, 55); g.lineTo(w / 2 + 14, 55); g.lineTo(xr, cy + rr); g.stroke();
+  g.fillStyle = COL.ink; rrect(g, w / 2 - 10, 54, 20, 7, 2); g.fill();
+  [[xl, rl], [xr, rr]].forEach(([x, r], idx) => {
+    g.fillStyle = COL.tape; g.beginPath(); g.arc(x, cy, r, 0, 6.2832); g.fill();
+    g.strokeStyle = COL.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(x, cy, r, 0, 6.2832); g.stroke();
+    g.fillStyle = COL.card; g.beginPath(); g.arc(x, cy, 10, 0, 6.2832); g.fill();
+    g.strokeStyle = COL.ink; g.lineWidth = 2;
+    for (let k = 0; k < 3; k++) { const a = reel.th * (idx ? 1 : 1) + k * 2.0944; g.beginPath(); g.moveTo(x + Math.cos(a) * 3, cy + Math.sin(a) * 3); g.lineTo(x + Math.cos(a) * 9, cy + Math.sin(a) * 9); g.stroke(); }
+    g.fillStyle = COL.rec; g.beginPath(); g.arc(x, cy, 2.5, 0, 6.2832); g.fill();
+  });
+}
+
+/* piatto */
+const platterC = $('platterC');
+function drawPlatter() {
+  const c = platterC, dpr = Math.min(window.devicePixelRatio || 1, 3), w = c.clientWidth;
+  if (!w) return;
+  if (c.width !== Math.round(w * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(w * dpr); }
+  const g = c.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, w, w);
+  const R = w / 2 - 2, cx = w / 2, cy = w / 2, ang = (P.pos / REV_SEC) * 2 * Math.PI;
+  // corpo
+  g.fillStyle = COL.card; g.beginPath(); g.arc(cx, cy, R, 0, 6.2832); g.fill();
+  g.strokeStyle = COL.ink; g.lineWidth = 2.5; g.beginPath(); g.arc(cx, cy, R, 0, 6.2832); g.stroke();
+  // anelli lavorati
+  g.lineWidth = 1;
+  for (let i = 0; i < 14; i++) { g.strokeStyle = i % 2 ? 'rgba(38,34,25,0.07)' : 'rgba(38,34,25,0.14)'; g.beginPath(); g.arc(cx, cy, R * (0.3 + i * 0.045), 0, 6.2832); g.stroke(); }
+  g.save(); g.translate(cx, cy); g.rotate(ang);
+  // tacche
+  g.strokeStyle = COL.ink;
+  for (let i = 0; i < 60; i++) {
+    const a = i / 60 * 6.2832, big = i % 5 === 0;
+    g.lineWidth = big ? 2 : 1;
+    g.beginPath(); g.moveTo(Math.cos(a) * R * (big ? 0.88 : 0.91), Math.sin(a) * R * (big ? 0.88 : 0.91)); g.lineTo(Math.cos(a) * R * 0.96, Math.sin(a) * R * 0.96); g.stroke();
+  }
+  // punto arancio
+  g.fillStyle = COL.rec; g.beginPath(); g.arc(R * 0.74, 0, R * 0.055, 0, 6.2832); g.fill();
+  // ingranaggio centrale
+  g.fillStyle = COL.pan; g.beginPath(); g.arc(0, 0, R * 0.2, 0, 6.2832); g.fill();
+  g.strokeStyle = COL.ink; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, R * 0.2, 0, 6.2832); g.stroke();
+  g.lineWidth = 2;
+  for (let k = 0; k < 3; k++) { const a = k * 2.0944; g.beginPath(); g.moveTo(Math.cos(a) * R * 0.04, Math.sin(a) * R * 0.04); g.lineTo(Math.cos(a) * R * 0.17, Math.sin(a) * R * 0.17); g.stroke(); }
+  g.restore();
+  g.fillStyle = COL.ink; g.beginPath(); g.arc(cx, cy, R * 0.028, 0, 6.2832); g.fill();
+  // indice fisso in alto
+  g.fillStyle = COL.ink; g.beginPath(); g.moveTo(cx, 2); g.lineTo(cx - 6, -4); g.lineTo(cx + 6, -4); g.closePath(); g.fill();
+}
+
+/* barra posizione */
+function drawPlWave() {
+  const { g, w, h } = fit(plWave, 64);
+  if (!w) return;
+  g.clearRect(0, 0, w, h);
+  if (!P.buf) return;
+  const t = P.take, dur = P.buf.duration, n = t.peaks.length, prog = P.pos / dur;
+  if (P.loop.on) { g.fillStyle = 'rgba(236,74,26,0.14)'; g.fillRect(P.loop.a / dur * w, 0, (P.loop.b - P.loop.a) / dur * w, h); g.fillStyle = COL.rec; g.fillRect(P.loop.a / dur * w, 0, 2, h); g.fillRect(P.loop.b / dur * w - 2, 0, 2, h); }
+  for (let x = 0; x < w; x += 3) {
+    const v = n ? t.peaks[Math.min(n - 1, Math.floor(x / w * n))] : 0;
+    const bh = Math.max(2, Math.sqrt(v) * (h - 10));
+    g.fillStyle = x / w <= prog ? COL.rec : COL.mute;
+    g.fillRect(x, (h - bh) / 2, 2, bh);
+  }
+  g.fillStyle = COL.amb;
+  t.markers.forEach((m) => g.fillRect(Math.round(m / dur * w), 0, 2, 8));
+  g.fillStyle = COL.ink; g.fillRect(Math.round(prog * w), 0, 2, h);
+}
+
+/* ciclo di disegno */
+let lastTs = 0, lastTimer = '', lastBuf = '', lastPlT = '';
 function frame(ts) {
   const dt = Math.min(0.1, (ts - lastTs) / 1000 || 0.016); lastTs = ts;
   for (const k of ['l', 'r']) {
@@ -615,138 +1179,63 @@ function frame(ts) {
     if (db >= s.hold) { s.hold = db; s.holdT = ts; } else if (ts - s.holdT > 1500) s.hold = Math.max(db, s.hold - dt * 20);
     if (raw >= 0.985) s.clip = true;
   }
-  drawMeter();
-  const secs = rec ? rec.frames / rec.sr : 0;
-  const t = fmt(secs).padStart(5, '0') + '|' + Math.floor((secs % 1) * 10);
-  if (t !== lastTimer) { lastTimer = t; const p = t.split('|'); $('timer').innerHTML = p[0] + '<small>.' + p[1] + '</small>'; }
-  let buf = '—';
-  if (rec) buf = rec.bytes ? mb(rec.bytes) : '—';
-  else if (inputOn && S.pre > 0 && ctx) buf = Math.min(S.pre, ringFrames / ctx.sampleRate).toFixed(0) + ' s';
-  const lbl = (rec ? 'dimensione' : 'pre-roll') + '<br>' + buf;
-  if (lbl !== lastBuf) { lastBuf = lbl; $('bufInfo').innerHTML = lbl; }
+  tickPlayer();
+  if (S.tab === 'rec') {
+    drawDials(); drawTape(dt);
+    const secs = rec ? rec.frames / rec.sr : 0;
+    const t = fmt(secs).padStart(5, '0') + '|' + Math.floor((secs % 1) * 10);
+    if (t !== lastTimer) { lastTimer = t; const p = t.split('|'); $('timer').innerHTML = p[0] + '<small>.' + p[1] + '</small>'; }
+    let buf = '—';
+    if (rec) buf = rec.bytes ? mb(rec.bytes) : '—';
+    else if (inputOn && S.pre > 0 && ctx) buf = Math.min(S.pre, ringFrames / ctx.sampleRate).toFixed(0) + ' s';
+    const lbl = (rec ? 'dimensione' : 'pre-roll') + '<br>' + buf;
+    if (lbl !== lastBuf) { lastBuf = lbl; $('bufInfo').innerHTML = lbl; }
+  } else {
+    drawPlatter(); drawPlWave();
+    const pt = P.buf ? fmtT(P.pos) + ' / ' + fmt(P.buf.duration) : '0:00.0 / 0:00';
+    if (pt !== lastPlT) { lastPlT = pt; $('plTime').textContent = pt; }
+  }
   requestAnimationFrame(frame);
 }
 
-function drawMeter() {
-  const dpr = Math.min(window.devicePixelRatio || 1, 3);
-  const w = meterC.clientWidth, h = 84;
-  if (meterC.width !== Math.round(w * dpr) || meterC.height !== Math.round(h * dpr)) { meterC.width = Math.round(w * dpr); meterC.height = Math.round(h * dpr); }
-  mg.setTransform(dpr, 0, 0, dpr, 0, 0);
-  mg.clearRect(0, 0, w, h);
-  const bx = 20, bw = w - bx - 62, bh = 18;
-  const X = (db) => bx + Math.max(0, Math.min(1, (db - DBMIN) / -DBMIN)) * bw;
-  const mode = effMode();
-  mg.font = '11px ' + 'IBM Plex Mono, ui-monospace, monospace';
-  mg.textBaseline = 'middle';
-  [['l', 'L', 6], ['r', 'R', 30]].forEach(([k, name, y]) => {
-    const s = mState[k];
-    const dim = (mode === 'l' && k === 'r') || (mode === 'r' && k === 'l') || !inputOn;
-    mg.globalAlpha = dim ? 0.35 : 1;
-    mg.fillStyle = COL.mute; mg.textAlign = 'left'; mg.fillText(name, 2, y + bh / 2);
-    mg.fillStyle = COL.track; mg.fillRect(bx, y, bw, bh);
-    const x = X(s.d);
-    const z1 = X(-18), z2 = X(-6);
-    mg.fillStyle = COL.ok; mg.fillRect(bx, y, Math.min(x, z1) - bx, bh);
-    if (x > z1) { mg.fillStyle = COL.amb; mg.fillRect(z1, y, Math.min(x, z2) - z1, bh); }
-    if (x > z2) { mg.fillStyle = COL.rec; mg.fillRect(z2, y, x - z2, bh); }
-    if (s.hold > DBMIN) { mg.fillStyle = COL.ink; mg.fillRect(X(s.hold) - 1, y - 1, 2, bh + 2); }
-    mg.fillStyle = s.clip ? COL.rec : COL.line;
-    mg.beginPath(); mg.arc(bx + bw + 12, y + bh / 2, 6, 0, 6.2832); mg.fill();
-    mg.fillStyle = COL.ink; mg.textAlign = 'right';
-    mg.fillText(s.hold > -89 ? s.hold.toFixed(1) : '--', w - 2, y + bh / 2);
-    mg.globalAlpha = 1;
-  });
-  mg.fillStyle = COL.mute; mg.textAlign = 'center'; mg.font = '10px IBM Plex Mono, ui-monospace, monospace';
-  [-60, -40, -20, -12, -6, 0].forEach((db) => {
-    mg.fillRect(X(db), 52, 1, 5);
-    mg.fillText(String(db), Math.min(Math.max(X(db), bx + 8), bx + bw - 6), 66);
-  });
-  mg.textAlign = 'left'; mg.fillText('dBFS', 2, 78);
-}
-
-/* ---------- registrazioni ---------- */
-const audio = new Audio();
-audio.preload = 'auto';
-let playing = null, playUrl = null;
-
+/* ---------- elenco nastri ---------- */
 function renderList() {
   const el = $('list');
   if (!takes.length) {
-    el.innerHTML = '<p class="empty">Ancora nessuna registrazione. Attiva l\'ingresso e tocca REC.</p>';
+    el.innerHTML = '<p class="empty">Ancora nessun nastro. Vai su Registra, attiva l\'ingresso e tocca REC.</p>';
     $('listMeta').textContent = '';
     return;
   }
   const tot = takes.reduce((n, t) => n + t.size, 0);
   $('listMeta').textContent = takes.length + ' · ' + mb(tot);
-  el.innerHTML = takes.map((t) => '<article class="take" data-id="' + t.id + '">' +
-    '<input class="tname" aria-label="Nome registrazione" value="' + esc(t.name) + '" data-id="' + t.id + '">' +
-    '<div class="take-meta">' + fmt(t.duration) + ' · ' + (t.sr / 1000) + ' kHz · ' + t.bits + ' bit · ' + (t.ch === 2 ? 'stereo' : 'mono') + ' · ' + mb(t.size) + '</div>' +
-    '<canvas class="wave" data-id="' + t.id + '" aria-label="Forma d\'onda. Tocca per spostarti."></canvas>' +
-    '<div class="marks">' + t.markers.map((m, i) => '<button class="chip" data-act="seek" data-id="' + t.id + '" data-t="' + m + '">M' + (i + 1) + ' ' + fmt(m) + '</button>').join('') + '</div>' +
+  el.innerHTML = takes.map((t) => '<article class="take" data-id="' + t.id + '" data-loaded="' + (P.take && P.take.id === t.id) + '">' +
+    '<input class="tname" aria-label="Nome del nastro" value="' + esc(t.name) + '" data-id="' + t.id + '">' +
+    '<div class="take-meta">' + fmt(t.duration) + ' · ' + (t.sr / 1000) + ' kHz · ' + t.bits + ' bit · ' + (t.ch === 2 ? 'stereo' : 'mono') + ' · ' + mb(t.size) + (t.markers.length ? ' · ' + t.markers.length + ' marker' : '') + '</div>' +
+    '<canvas class="wave" data-id="' + t.id + '" aria-hidden="true"></canvas>' +
     '<div class="take-actions">' +
-      '<button class="btn sm" data-act="play" data-id="' + t.id + '">' + (playing === t.id && !audio.paused ? 'Pausa' : 'Ascolta') + '</button>' +
+      '<button class="btn sm" data-act="load" data-id="' + t.id + '">Carica nel player</button>' +
       '<button class="btn sm" data-act="share" data-id="' + t.id + '">Salva / Condividi</button>' +
       '<button class="btn sm del" data-act="del" data-id="' + t.id + '">Elimina</button>' +
     '</div></article>').join('');
   requestAnimationFrame(drawAllWaves);
 }
-
-function drawWave(c, t, prog) {
-  const dpr = Math.min(window.devicePixelRatio || 1, 3);
-  const w = c.clientWidth, h = 56;
-  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
-  const g = c.getContext('2d');
-  g.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const n = t.peaks.length, step = 3;
-  for (let x = 0; x < w; x += step) {
-    const v = n ? t.peaks[Math.min(n - 1, Math.floor(x / w * n))] : 0;
-    const bh = Math.max(2, Math.sqrt(v) * (h - 8));
-    g.fillStyle = x / w <= prog ? COL.rec : COL.mute;
-    g.fillRect(x, (h - bh) / 2, 2, bh);
-  }
-  g.fillStyle = COL.amb;
-  t.markers.forEach((m) => { g.fillRect(Math.round(m / t.duration * w), 0, 2, h); });
-  if (prog > 0) { g.fillStyle = COL.ink; g.fillRect(Math.round(prog * w), 0, 2, h); }
-}
 function drawAllWaves() {
   document.querySelectorAll('canvas.wave').forEach((c) => {
     const t = takes.find((x) => x.id === c.dataset.id);
-    if (t) drawWave(c, t, playing === t.id && audio.duration ? audio.currentTime / audio.duration : 0);
+    if (!t) return;
+    const { g, w, h } = fit(c, 48);
+    if (!w) return;
+    g.clearRect(0, 0, w, h);
+    const n = t.peaks.length;
+    for (let x = 0; x < w; x += 3) {
+      const v = n ? t.peaks[Math.min(n - 1, Math.floor(x / w * n))] : 0;
+      const bh = Math.max(2, Math.sqrt(v) * (h - 8));
+      g.fillStyle = COL.mute; g.fillRect(x, (h - bh) / 2, 2, bh);
+    }
+    g.fillStyle = COL.amb; t.markers.forEach((m) => g.fillRect(Math.round(m / t.duration * w), 0, 2, 7));
   });
 }
 window.addEventListener('resize', () => requestAnimationFrame(drawAllWaves));
-
-function updatePlayButtons() {
-  document.querySelectorAll('[data-act="play"]').forEach((b) => { b.textContent = (playing === b.dataset.id && !audio.paused) ? 'Pausa' : 'Ascolta'; });
-}
-function playLoop() {
-  if (!playing || audio.paused) return;
-  const c = document.querySelector('canvas.wave[data-id="' + playing + '"]');
-  const t = takes.find((x) => x.id === playing);
-  if (c && t && audio.duration) drawWave(c, t, audio.currentTime / audio.duration);
-  requestAnimationFrame(playLoop);
-}
-audio.addEventListener('play', () => { updatePlayButtons(); requestAnimationFrame(playLoop); });
-audio.addEventListener('pause', updatePlayButtons);
-audio.addEventListener('ended', () => { const id = playing; playing = null; updatePlayButtons(); drawAllWaves(); });
-
-function togglePlay(id) {
-  if (rec) { banner('Ferma la registrazione prima di ascoltare.'); return; }
-  const t = takes.find((x) => x.id === id); if (!t) return;
-  if (playing === id) { if (audio.paused) audio.play().catch(() => {}); else audio.pause(); return; }
-  if (inputOn) releaseInput();
-  if (playUrl) URL.revokeObjectURL(playUrl);
-  playUrl = URL.createObjectURL(t.blob);
-  audio.src = playUrl; playing = id;
-  audio.play().catch(() => {});
-  drawAllWaves();
-}
-function seek(id, secs) {
-  if (playing !== id) {
-    togglePlay(id);
-    audio.addEventListener('loadedmetadata', () => { audio.currentTime = secs; }, { once: true });
-  } else audio.currentTime = secs;
-}
 
 async function share(t) {
   const name = safe(t.name) + '.wav';
@@ -761,22 +1250,14 @@ async function share(t) {
 }
 
 $('list').addEventListener('click', (e) => {
-  const c = e.target.closest('canvas.wave');
-  if (c) {
-    const t = takes.find((x) => x.id === c.dataset.id); if (!t) return;
-    const r = c.getBoundingClientRect();
-    seek(t.id, Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * t.duration);
-    return;
-  }
   const b = e.target.closest('button[data-act]'); if (!b) return;
   const id = b.dataset.id, act = b.dataset.act;
   const t = takes.find((x) => x.id === id);
-  if (act === 'play') togglePlay(id);
-  else if (act === 'seek') seek(id, Number(b.dataset.t));
+  if (act === 'load') loadTake(id);
   else if (act === 'share' && t) share(t);
   else if (act === 'del' && t) {
     if (b.dataset.armed === 'true') {
-      if (playing === id) { audio.pause(); playing = null; }
+      if (P.take && P.take.id === id) unloadTake();
       takes = takes.filter((x) => x.id !== id);
       tx('takes', 'readwrite', (s) => s.delete(id)).catch(() => {});
       renderList();
@@ -791,6 +1272,7 @@ $('list').addEventListener('change', (e) => {
   const t = takes.find((x) => x.id === e.target.dataset.id); if (!t) return;
   t.name = e.target.value.trim() || defaultName(new Date(t.created));
   e.target.value = t.name;
+  if (P.take && P.take.id === t.id) $('plName').textContent = t.name;
   tx('takes', 'readwrite', (s) => s.put(t)).catch(() => {});
 });
 
@@ -798,9 +1280,11 @@ $('list').addEventListener('change', (e) => {
 function appleIcon() {
   const c = document.createElement('canvas'); c.width = c.height = 180;
   const g = c.getContext('2d');
-  g.fillStyle = '#F5EEDB'; g.fillRect(0, 0, 180, 180);
-  g.fillStyle = '#2B2721'; g.beginPath(); g.arc(90, 90, 58, 0, 6.2832); g.fill();
-  g.fillStyle = '#C23B2B'; g.beginPath(); g.arc(90, 90, 40, 0, 6.2832); g.fill();
+  g.fillStyle = '#F3ECDA'; g.fillRect(0, 0, 180, 180);
+  g.fillStyle = '#262219'; g.beginPath(); g.arc(90, 90, 62, 0, 6.2832); g.fill();
+  g.fillStyle = '#FAF6E9'; g.beginPath(); g.arc(90, 90, 50, 0, 6.2832); g.fill();
+  g.fillStyle = '#EC4A1A'; g.beginPath(); g.arc(90, 52, 9, 0, 6.2832); g.fill();
+  g.fillStyle = '#262219'; g.beginPath(); g.arc(90, 90, 7, 0, 6.2832); g.fill();
   const l = document.createElement('link'); l.rel = 'apple-touch-icon'; l.href = c.toDataURL('image/png'); document.head.appendChild(l);
 }
 
@@ -808,7 +1292,9 @@ async function init() {
   appleIcon();
   $('gain').value = S.gain;
   $('gainOut').textContent = (S.gain > 0 ? '+' : '') + S.gain.toFixed(1) + ' dB';
-  updateUI();
+  P.target = KV.speed;
+  buildKnobs();
+  updateUI(); updatePlayerUI();
   requestAnimationFrame(frame);
   try {
     await db();
@@ -825,7 +1311,7 @@ async function init() {
         banner('Trovata una registrazione interrotta di ' + fmt(secs) + '.', {
           label: 'Recupera',
           fn: async () => {
-            try { const t = await buildTake(meta, [], meta.markers || []); if (t) { takes.unshift(t); renderList(); banner('Recuperata: ' + t.name); } }
+            try { const t = await buildTake(meta, [], meta.markers || []); if (t) { takes.unshift(t); renderList(); banner('Recuperato: ' + t.name); } }
             catch (e) { banner('Recupero non riuscito: ' + ((e && e.message) || e)); }
           }
         });
